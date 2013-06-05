@@ -10,20 +10,10 @@ app.use(express.logger());
 var fs = require("fs");
 
 var knox = require("knox");
-var configPath = __dirname + '/secret.json';
-var s3Client;
-fs.readFile(configPath, 'utf8', function (err, data) {
-  if (err) {
-    console.log('Error: ' + err);
-    return;
-  }
-  config = JSON.parse(data);
-  // TODO look into env vars and files
-	s3Client = knox.createClient({
-		key: process.env.AWS_ACCESS_KEY_ID || config['s3Key'],
-		secret: process.env.AWS_SECRET_ACCESS_KEY || config['s3Secret'],
-		bucket: "catipedia.memrise.com"
-	});
+var s3Client = knox.createClient({
+	key: process.env.AWS_ACCESS_KEY_ID,
+	secret: process.env.AWS_SECRET_ACCESS_KEY,
+	bucket: "catipedia.memrise.com"
 });
 
 app.get('/', function(request, response) {
