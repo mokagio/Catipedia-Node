@@ -3,6 +3,7 @@ var testDirName = "test";
 var testPahtOnServer = '/' + testDirName + '/' + testFileName;
 
 var express = require("express");
+var multipart = require("multipart");
 var app = express();
 app.use(express.logger());
 
@@ -38,23 +39,20 @@ app.get('/upload-test/', function(request, response) {
 });
 
 app.post('/upload/', function(request, response) {
+	request.setBodyEncoding('binary');
 
-	console.log(request);
-
-	fs.readFile(testFileName, function(err, buf){
-		var req = s3Client.put(testPahtOnServer, {
-			'Content-Length': buf.length,
-			'Content-Type': 'text/plain'
+	var stream = new multipart.Stream(request);
+	stream.addListener('part', function(part){
+		part.addListener('body', function(chunck) {
+			var progress = (stream.bytesReceived / stream.bytesTotal * 100).toFixed(2);
+			var mb = (stream.bytesTotal / 1024 / 1024).toFixed(1);
 		});
-		req.on('response', function(res){
-			if (200 == res.statusCode) {
-				console.log('saved to %s', req.url);
-				response.writeHead(200, { 'Content-Type': 'application/json' });
-				response.send({"status":"success"});
-				response.end();
-			}
-		});
-		req.end(buf);
+		console.log("Uploading " + mb + "MB (" + progress + "%)");
+	});
+	stream.addListener('complete', function() {
+		response.sendHeader(200, {'Content-Type':'application/json'});
+		response.finish();
+		console.log("Done :)");
 	});
 });
 
