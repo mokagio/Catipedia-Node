@@ -18,10 +18,11 @@ fs.readFile(configPath, 'utf8', function (err, data) {
     return;
   }
   config = JSON.parse(data);
+  // TODO look into env vars and files
 	s3Client = knox.createClient({
-		key: config['s3Key'],
-		secret: config['s3Secret'],
-		bucket: config['s3Bucket']
+		key: process.env.AWS_ACCESS_KEY_ID || config['s3Key'],
+		secret: process.env.AWS_SECRET_ACCESS_KEY || config['s3Secret'],
+		bucket: "catipedia.memrise.com"
 	});
 });
 
