@@ -56,6 +56,28 @@ app.post('/upload/', function(request, response) {
 	});
 });
 
+app.get('/cats/', function(request, response) {
+	var pg = require('pg');
+
+	var result = [];
+	pg.connect(process.env.DATABASE_URL, function(err, client) {
+		var query = client.query('SELECT * FROM entries');
+
+		query.on('row', function(row) {
+			// result.push(JSON.stringify(row));
+			result.push(row);
+		});
+
+		query.on('end', function() {
+			console.log(result);
+			var objToJson = { "entries":result };
+			response.writeHead(200, {"Content-Type": "application/json"});
+			response.write(JSON.stringify(objToJson));
+			response.end();
+		});
+	});
+});
+
 var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log("Listening on " + port);
