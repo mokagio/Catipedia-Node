@@ -6,6 +6,7 @@ var express = require("express");
 var multipart = require("multipart");
 var app = express();
 app.use(express.logger());
+app.use(express.bodyParser());
 
 // TODO find out about coding style and where to place the require
 var fs = require("fs");
@@ -75,6 +76,17 @@ app.get('/cats/', function(request, response) {
 			response.end();
 		});
 	});
+});
+
+app.post('/cats/new/', function(request,response) {
+	var jsonObject = request.body;
+
+	var name = jsonObject['name'];
+	var link = jsonObject['link'];
+
+	console.log(name + " " + link);
+
+	response.send(200);
 });
 
 var port = process.env.PORT || 5000;
