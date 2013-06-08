@@ -74,6 +74,7 @@ app.get('/cats/', function(request, response) {
 			response.writeHead(200, {"Content-Type": "application/json"});
 			response.write(JSON.stringify(objToJson));
 			response.end();
+			client.end();
 		});
 	});
 });
@@ -84,9 +85,13 @@ app.post('/cats/new/', function(request,response) {
 	var name = jsonObject['name'];
 	var link = jsonObject['link'];
 
-	console.log(name + " " + link);
-
-	response.send(200);
+	var pg = require('pg');
+	pg.connect(process.env.DATABASE_URL, function(err, client) {
+		var query = client.query('INSERT INTO entries(name, link) VALUES($1, $2)', [name, link]);
+		query.on('end', function() {
+			response.send(200);
+		});
+	});
 });
 
 var port = process.env.PORT || 5000;
