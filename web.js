@@ -64,7 +64,6 @@ app.get('/cats/', function(request, response) {
 		var query = client.query('SELECT * FROM entries');
 
 		query.on('row', function(row) {
-			// result.push(JSON.stringify(row));
 			result.push(row);
 		});
 
